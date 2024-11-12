@@ -2,7 +2,6 @@ package br.com.Views;
 
 import br.com.DAO.ConexaoDAO;
 import br.com.DAO.LaboratorioDAO;
-import br.com.DTO.EquipamentoDTO;
 import br.com.DTO.LaboratorioDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,77 +21,90 @@ public class TelaLaboratorio extends javax.swing.JFrame {
     }
 
     public void pesquisarLaboratorio() {
-        String sql = "SELECT l.id_laboratorio, l.numeroDaSala AS N_Sala, e.modelo AS Modelo, "
-                + "e.numeroSerie AS N°_Serie, e.statusEquipamento AS Status_Equipamento "
-                + "FROM laboratorio l "
-                + "JOIN equipamento e ON l.id_equipamento = e.id_equipamento "
-                + "WHERE l.id_laboratorio = ?";
+        String sql = "SELECT l.nome AS Laboratório, "
+                + "COUNT(m.id_maquina) AS quantidade_maquinas, "
+                + "SUM(CASE WHEN m.status = 'funcionando' THEN 1 ELSE 0 END) AS maquinas_funcionando, "
+                + "SUM(CASE WHEN m.status = 'em_manutencao' THEN 1 ELSE 0 END) AS maquinas_em_manutencao, "
+                + "SUM(CASE WHEN m.status = 'fora_de_uso' THEN 1 ELSE 0 END) AS maquinas_fora_de_uso "
+                + "FROM laboratorios l "
+                + "LEFT JOIN maquinas m ON l.id_laboratorio = m.id_laboratorio "
+                + "GROUP BY l.id_laboratorio, l.nome "
+                + "ORDER BY quantidade_maquinas DESC";
 
         try {
             pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtIdLab.getText());
             rs = pst.executeQuery();
 
             if (rs.next()) {
-                txtNSala.setText(rs.getString(2));
-                txtModelo.setText(rs.getString(3));
-                txtNSerie.setText(rs.getString(4));
-                txtStatus.setText(rs.getString(5));
+                txtNSala.setText(rs.getString(1));
+                txtQtdMaquina.setText(rs.getString(2));
+                txtMaquinasFuncionando.setText(rs.getString(3));
+                txtMaquinasManutencao.setText(rs.getString(4));
+                txtMaquinasForaUso.setText(rs.getString(5));
             } else {
                 JOptionPane.showMessageDialog(null, "Lab não existe!");
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, " Metodo pesquisar " + e);
-        }
-
-    }
-
-    public void pesquisarEquipamentoTabela() {
-        String sql = "SELECT l.id_laboratorio, l.numeroDaSala AS N_Sala, e.modelo AS Modelo, "
-                + "e.numeroSerie AS N°_Serie, e.statusEquipamento AS Status_Equipamento "
-                + "FROM laboratorio l "
-                + "JOIN equipamento e ON l.id_equipamento = e.id_equipamento "
-                + "WHERE l.id_laboratorio = ?";
-
-        try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtNumerolab.getText());
-            rs = pst.executeQuery();
-
-            tbLab.setModel(DbUtils.resultSetToTableModel(rs));
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, " Metodo pesquisar " + e);
+            JOptionPane.showMessageDialog(null, "Metodo pesquisar " + e);
         }
     }
+
+    private void pesquisarEquipamentoTabela() {
+    String sql = "SELECT l.nome AS Laboratório, "
+               + "COUNT(m.id_maquina) AS quantidade_maquinas, "
+               + "SUM(CASE WHEN m.status = 'funcionando' THEN 1 ELSE 0 END) AS maquinas_funcionando, "
+               + "SUM(CASE WHEN m.status = 'em_manutencao' THEN 1 ELSE 0 END) AS maquinas_em_manutencao, "
+               + "SUM(CASE WHEN m.status = 'fora_de_uso' THEN 1 ELSE 0 END) AS maquinas_fora_de_uso "
+               + "FROM laboratorios l "
+               + "LEFT JOIN maquinas m ON l.id_laboratorio = m.id_laboratorio "
+               + "GROUP BY l.id_laboratorio, l.nome "
+               + "ORDER BY quantidade_maquinas DESC";
+
+    try {
+        pst = conexao.prepareStatement(sql);
+
+        rs = pst.executeQuery();
+
+        tbLaboratorio.setModel(DbUtils.resultSetToTableModel(rs));
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Erro ao pesquisar equipamentos: " + e.getMessage());
+    }
+}
+
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton4 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         txtNumerolab = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tbLab = new javax.swing.JTable();
+        tbLaboratorio = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
         txtIdLab = new javax.swing.JTextField();
         txtNSala = new javax.swing.JTextField();
-        txtModelo = new javax.swing.JTextField();
-        txtNSerie = new javax.swing.JTextField();
-        txtStatus = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnPesquisar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnLimpar = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        txtQtdMaquina = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        txtMaquinasFuncionando = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        txtMaquinasManutencao = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        txtMaquinasForaUso = new javax.swing.JTextField();
+
+        jButton4.setText("jButton4");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("N° da Sala");
+        jLabel1.setText("ID Laboratorio tabela");
 
         txtNumerolab.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -105,47 +117,53 @@ public class TelaLaboratorio extends javax.swing.JFrame {
             }
         });
 
-        tbLab.setModel(new javax.swing.table.DefaultTableModel(
+        tbLaboratorio.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Modelo", "N° Serie", "Status"
+                "Laboratorio", "Quantidade Maquinas", "Maquinas Funcionando", "Maquinas em Manutenção", "Maquinas Fora de Uso"
             }
         ));
-        jScrollPane1.setViewportView(tbLab);
+        jScrollPane1.setViewportView(tbLaboratorio);
 
         jLabel2.setText("ID Laboratorio");
 
-        jLabel3.setText("N° da sala");
+        jLabel3.setText("Labin");
 
-        jLabel4.setText("Modelo");
-
-        jLabel5.setText("N° de Serie");
-
-        jLabel6.setText("Status ");
-
-        jButton1.setText("Pesquisar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        txtIdLab.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                txtIdLabActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Editar");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        txtNSala.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                txtNSalaActionPerformed(evt);
             }
         });
 
-        jButton5.setText("Limpar");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        btnPesquisar.setText("Pesquisar");
+        btnPesquisar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                btnPesquisarActionPerformed(evt);
+            }
+        });
+
+        btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+
+        btnLimpar.setText("Limpar");
+        btnLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimparActionPerformed(evt);
             }
         });
 
@@ -156,47 +174,83 @@ public class TelaLaboratorio extends javax.swing.JFrame {
             }
         });
 
+        jLabel4.setText("Quantidade Maquinas");
+
+        txtQtdMaquina.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtQtdMaquinaActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Maquinas Funcionando");
+
+        txtMaquinasFuncionando.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtMaquinasFuncionandoActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Maquinas em Manutenção");
+
+        jLabel7.setText("Maquinas Fora de Uso");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGap(0, 10, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 656, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(txtNumerolab, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(40, 40, 40)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addGap(72, 72, 72)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtNumerolab, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtIdLab, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton2)
+                                .addGap(28, 28, 28))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jButton1))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(72, 72, 72)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(txtModelo)
-                                            .addComponent(txtNSerie)
-                                            .addComponent(txtStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
-                                            .addComponent(txtNSala)
-                                            .addComponent(txtIdLab, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton2))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jButton3)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jButton5)))))))
-                .addContainerGap(15, Short.MAX_VALUE))
+                                .addComponent(txtNSala, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnPesquisar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnEditar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnLimpar))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel4)
+                                        .addComponent(jLabel5))
+                                    .addGap(32, 32, 32)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(txtQtdMaquina)
+                                        .addComponent(txtMaquinasFuncionando, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)))
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel6)
+                                        .addComponent(jLabel7))
+                                    .addGap(18, 18, 18)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txtMaquinasManutencao, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+                                        .addComponent(txtMaquinasForaUso)))))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -204,47 +258,45 @@ public class TelaLaboratorio extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(txtIdLab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtIdLab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(29, 29, 29)
-                                .addComponent(jLabel2))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jButton2)))
+                        .addGap(29, 29, 29)
+                        .addComponent(jLabel2)
                         .addGap(6, 6, 6)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addComponent(jLabel3)
-                        .addGap(26, 26, 26)
-                        .addComponent(jLabel4)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel5)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel6))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(txtNSala, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtModelo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
-                        .addComponent(txtNSerie, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(26, 26, 26)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton3)
-                    .addComponent(jButton5))
-                .addGap(54, 54, 54)
+                    .addComponent(txtNSala, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtQtdMaquina, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtMaquinasFuncionando, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtMaquinasManutencao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(txtMaquinasForaUso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPesquisar)
+                    .addComponent(btnEditar)
+                    .addComponent(btnLimpar))
+                .addGap(60, 60, 60)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtNumerolab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43)
+                .addGap(32, 32, 32)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(44, 44, 44))
+                .addGap(19, 19, 19))
         );
 
         pack();
@@ -255,37 +307,53 @@ public class TelaLaboratorio extends javax.swing.JFrame {
         pesquisarEquipamentoTabela();
     }//GEN-LAST:event_txtNumerolabKeyReleased
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed
         pesquisarLaboratorio();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnPesquisarActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        String idLaboratorio = txtIdLab.getText();
-        String nSala = txtNSala.getText();
-        String modelo = txtModelo.getText();
-        String numeroSerie = txtNSerie.getText();
-        String statusEquipamento = txtStatus.getText();
-        
-        LaboratorioDTO objDTO = new LaboratorioDTO();
-        objDTO.setIdLaboratorio(Integer.parseInt(idLaboratorio));
-        objDTO.setnSala(nSala);
-        objDTO.setModelo(modelo);
-        objDTO.setNumeroSerie(numeroSerie);
-        objDTO.setStatusEquipamento(statusEquipamento);
-        
-        LaboratorioDAO objLabDAO = new LaboratorioDAO();
-        objLabDAO.editarLab(objDTO);
-        
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+    
+       // Pega os dados dos campos de texto
+String nSala = txtNSala.getText();  // Nome da sala (laboratório)
+String QuantidadeMaquina = txtQtdMaquina.getText();  // Quantidade de máquinas
+String MaquinasFuncionando = txtMaquinasFuncionando.getText();  // Máquinas funcionando
+String MaquinasManutencao = txtMaquinasManutencao.getText();  // Máquinas em manutenção
+String MaquinasForaUso = txtMaquinasForaUso.getText();
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-       txtIdLab.setText(null);
-       txtModelo.setText(null);
-       txtNSala.setText(null);
-       txtNSerie.setText(null);
-       txtNumerolab.setText(null);
-       txtStatus.setText(null);
-    }//GEN-LAST:event_jButton5ActionPerformed
+try {
+    
+
+    // Cria um objeto DTO e preenche com os dados da interface
+    LaboratorioDTO objDTO = new LaboratorioDTO();
+    objDTO.setnSala(nSala);
+    objDTO.setQuantidadeMaquinas(QuantidadeMaquina);
+    objDTO.setMaquinasFuncionando(MaquinasFuncionando);
+    objDTO.setMaquinasManutencao(MaquinasManutencao);
+    objDTO.setMaquinasForaUso(MaquinasForaUso);
+
+    // Instancia o DAO e chama o método para editar os dados
+    LaboratorioDAO objLabDAO = new LaboratorioDAO();
+    objLabDAO.editarLab(objDTO);  // Passa o DTO para o método editarLab
+} catch (NumberFormatException e) {
+    // Caso o ID do laboratório não seja um número válido
+    JOptionPane.showMessageDialog(null, "Por favor, insira um ID válido para o laboratório.");
+} catch (Exception e) {
+    // Tratamento de outras exceções
+    JOptionPane.showMessageDialog(null, "Erro ao editar laboratório: " + e.getMessage());
+}
+
+
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
+        txtIdLab.setText(null);
+        txtQtdMaquina.setText(null);
+        txtNSala.setText(null);
+        txtMaquinasForaUso.setText(null);
+        txtNumerolab.setText(null);
+        txtMaquinasFuncionando.setText(null);
+        txtMaquinasManutencao.setText(null);
+    }//GEN-LAST:event_btnLimparActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         TelaPrincipal tPrincipal = new TelaPrincipal();
@@ -296,6 +364,22 @@ public class TelaLaboratorio extends javax.swing.JFrame {
     private void txtNumerolabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumerolabActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNumerolabActionPerformed
+
+    private void txtNSalaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNSalaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNSalaActionPerformed
+
+    private void txtIdLabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdLabActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdLabActionPerformed
+
+    private void txtQtdMaquinaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtQtdMaquinaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtQtdMaquinaActionPerformed
+
+    private void txtMaquinasFuncionandoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMaquinasFuncionandoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtMaquinasFuncionandoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -333,23 +417,26 @@ public class TelaLaboratorio extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnLimpar;
+    private javax.swing.JButton btnPesquisar;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tbLab;
+    private javax.swing.JTable tbLaboratorio;
     private javax.swing.JTextField txtIdLab;
-    private javax.swing.JTextField txtModelo;
+    private javax.swing.JTextField txtMaquinasForaUso;
+    private javax.swing.JTextField txtMaquinasFuncionando;
+    private javax.swing.JTextField txtMaquinasManutencao;
     private javax.swing.JTextField txtNSala;
-    private javax.swing.JTextField txtNSerie;
     private javax.swing.JTextField txtNumerolab;
-    private javax.swing.JTextField txtStatus;
+    private javax.swing.JTextField txtQtdMaquina;
     // End of variables declaration//GEN-END:variables
 }

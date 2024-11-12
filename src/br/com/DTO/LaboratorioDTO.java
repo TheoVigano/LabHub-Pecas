@@ -1,43 +1,60 @@
-
 package br.com.DTO;
 
-
 public class LaboratorioDTO {
+
     private int idLaboratorio;
     private String nSala;
-    private String modelo;           
-    private String numeroSerie;      
-    private String statusEquipamento; 
-    
-    
+    private String QuantidadeMaquinas;
+    private String MaquinasFuncionando;
+    private String MaquinasManutencao;
+    private String MaquinasForaUso;
+
     public int getIdLaboratorio() {
         return idLaboratorio;
     }
+
     public void setIdLaboratorio(int idLaboratorio) {
         this.idLaboratorio = idLaboratorio;
     }
+
     public String getnSala() {
         return nSala;
     }
+
     public void setnSala(String nSala) {
         this.nSala = nSala;
     }
-    public String getModelo() {
-        return modelo;
+
+    public String getQuantidadeMaquinas() {
+        return QuantidadeMaquinas;
     }
-    public void setModelo(String modelo) {
-        this.modelo = modelo;
+
+    public void setQuantidadeMaquinas(String QuantidadeMaquinas) {
+        this.QuantidadeMaquinas = QuantidadeMaquinas;
     }
-    public String getNumeroSerie() {
-        return numeroSerie;
+
+    public String getMaquinasFuncionando() {
+        return MaquinasFuncionando;
     }
-    public void setNumeroSerie(String numeroSerie) {
-        this.numeroSerie = numeroSerie;
+
+    public void setMaquinasFuncionando(String MaquinasFuncionando) {
+        this.MaquinasFuncionando = MaquinasFuncionando;
     }
-    public String getStatusEquipamento() {
-        return statusEquipamento;
+
+    public String getMaquinasManutencao() {
+        return MaquinasManutencao;
     }
-    public void setStatusEquipamento(String statusEquipamento) {
-        this.statusEquipamento = statusEquipamento;
+
+    public void setMaquinasManutencao(String MaquinasManutencao) {
+        this.MaquinasManutencao = MaquinasManutencao;
     }
+
+    public String getMaquinasForaUso() {
+        return MaquinasForaUso;
+    }
+
+    public void setMaquinasForaUso(String MaquinasForaUso) {
+        this.MaquinasForaUso = MaquinasForaUso;
+    }
+
 }
