@@ -20,35 +20,41 @@ public class TelaLaboratorio extends javax.swing.JFrame {
         conexao = ConexaoDAO.conector();
     }
 
-    public void pesquisarLaboratorio() {
-        String sql = "SELECT l.nome AS Laboratório, "
-                + "COUNT(m.id_maquina) AS quantidade_maquinas, "
-                + "SUM(CASE WHEN m.status = 'funcionando' THEN 1 ELSE 0 END) AS maquinas_funcionando, "
-                + "SUM(CASE WHEN m.status = 'em_manutencao' THEN 1 ELSE 0 END) AS maquinas_em_manutencao, "
-                + "SUM(CASE WHEN m.status = 'fora_de_uso' THEN 1 ELSE 0 END) AS maquinas_fora_de_uso "
-                + "FROM laboratorios l "
-                + "LEFT JOIN maquinas m ON l.id_laboratorio = m.id_laboratorio "
-                + "GROUP BY l.id_laboratorio, l.nome "
-                + "ORDER BY quantidade_maquinas DESC";
+    // Método para pesquisar um laboratório específico
+public void pesquisarLaboratorioPorId(int idLaboratorio) {
+    String sql = "SELECT l.nome AS Laboratório, "
+            + "COUNT(m.id_maquina) AS quantidade_maquinas, "
+            + "SUM(CASE WHEN m.status = 'funcionando' THEN 1 ELSE 0 END) AS maquinas_funcionando, "
+            + "SUM(CASE WHEN m.status = 'em_manutencao' THEN 1 ELSE 0 END) AS maquinas_em_manutencao, "
+            + "SUM(CASE WHEN m.status = 'fora_de_uso' THEN 1 ELSE 0 END) AS maquinas_fora_de_uso "
+            + "FROM laboratorios l "
+            + "LEFT JOIN maquinas m ON l.id_laboratorio = m.id_laboratorio "
+            + "WHERE l.id_laboratorio = ? "
+            + "GROUP BY l.id_laboratorio, l.nome";
 
-        try {
-            pst = conexao.prepareStatement(sql);
-            rs = pst.executeQuery();
+    try {
+        // Conectando ao banco
+        conexao = ConexaoDAO.conector();
+        pst = conexao.prepareStatement(sql);
+        pst.setInt(1, idLaboratorio); // Definindo o id do laboratório na consulta
+        rs = pst.executeQuery();
 
-            if (rs.next()) {
-                txtNSala.setText(rs.getString(1));
-                txtQtdMaquina.setText(rs.getString(2));
-                txtMaquinasFuncionando.setText(rs.getString(3));
-                txtMaquinasManutencao.setText(rs.getString(4));
-                txtMaquinasForaUso.setText(rs.getString(5));
-            } else {
-                JOptionPane.showMessageDialog(null, "Lab não existe!");
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Metodo pesquisar " + e);
+        if (rs.next()) {
+            // Exibindo os dados no formulário
+            txtNSala.setText(rs.getString("Laboratório"));
+            txtQtdMaquina.setText(rs.getString("quantidade_maquinas"));
+            txtMaquinasFuncionando.setText(rs.getString("maquinas_funcionando"));
+            txtMaquinasManutencao.setText(rs.getString("maquinas_em_manutencao"));
+            txtMaquinasForaUso.setText(rs.getString("maquinas_fora_de_uso"));
+        } else {
+            JOptionPane.showMessageDialog(null, "Laboratório não encontrado!");
         }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Erro ao pesquisar laboratório: " + e);
     }
+}   
+
 
     private void pesquisarEquipamentoTabela() {
     String sql = "SELECT l.nome AS Laboratório, "
@@ -308,39 +314,30 @@ public class TelaLaboratorio extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNumerolabKeyReleased
 
     private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed
-        pesquisarLaboratorio();
+        int idLab = Integer.parseInt(txtIdLab.getText()); // Campo onde o usuário informa o ID
+    pesquisarLaboratorioPorId(idLab);
     }//GEN-LAST:event_btnPesquisarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
     
        // Pega os dados dos campos de texto
-String nSala = txtNSala.getText();  // Nome da sala (laboratório)
-String QuantidadeMaquina = txtQtdMaquina.getText();  // Quantidade de máquinas
-String MaquinasFuncionando = txtMaquinasFuncionando.getText();  // Máquinas funcionando
-String MaquinasManutencao = txtMaquinasManutencao.getText();  // Máquinas em manutenção
-String MaquinasForaUso = txtMaquinasForaUso.getText();
+String idLaboratorio = txtIdLab.getText();
+    String nomeLaboratorio = txtNSala.getText();
+    String quantidadeMaquinas = txtQtdMaquina.getText();
+    String maquinasFuncionando = txtMaquinasFuncionando.getText();
+    String maquinasManutencao = txtMaquinasManutencao.getText();
+    String maquinasForaUso = txtMaquinasForaUso.getText();
 
-try {
-    
-
-    // Cria um objeto DTO e preenche com os dados da interface
     LaboratorioDTO objDTO = new LaboratorioDTO();
-    objDTO.setnSala(nSala);
-    objDTO.setQuantidadeMaquinas(QuantidadeMaquina);
-    objDTO.setMaquinasFuncionando(MaquinasFuncionando);
-    objDTO.setMaquinasManutencao(MaquinasManutencao);
-    objDTO.setMaquinasForaUso(MaquinasForaUso);
+    objDTO.setIdLaboratorio(Integer.parseInt(idLaboratorio));
+    objDTO.setnSala(nomeLaboratorio);
+    objDTO.setQuantidadeMaquinas(quantidadeMaquinas);
+    objDTO.setMaquinasFuncionando(maquinasFuncionando);
+    objDTO.setMaquinasManutencao(maquinasManutencao);
+    objDTO.setMaquinasForaUso(maquinasForaUso);
 
-    // Instancia o DAO e chama o método para editar os dados
-    LaboratorioDAO objLabDAO = new LaboratorioDAO();
-    objLabDAO.editarLab(objDTO);  // Passa o DTO para o método editarLab
-} catch (NumberFormatException e) {
-    // Caso o ID do laboratório não seja um número válido
-    JOptionPane.showMessageDialog(null, "Por favor, insira um ID válido para o laboratório.");
-} catch (Exception e) {
-    // Tratamento de outras exceções
-    JOptionPane.showMessageDialog(null, "Erro ao editar laboratório: " + e.getMessage());
-}
+    LaboratorioDAO labDAO = new LaboratorioDAO();
+    labDAO.editarLab(objDTO);
 
 
     }//GEN-LAST:event_btnEditarActionPerformed
